@@ -1,0 +1,64 @@
+### GET request to example server
+GET https://examples.http-client.intellij.net/get
+    ?generated-in=IntelliJ IDEA
+
+### GET all dispositivos
+GET http://localhost:8080/api/v1/dispositivos
+
+###
+
+### GET dispositivos (filtro por tipo)
+GET http://localhost:8080/api/v1/dispositivos?tipo=movil
+
+###
+
+### GET dispositivos (filtro por marca)
+GET http://localhost:8080/api/v1/dispositivos?marca=Samsung
+
+###
+
+### GET dispositivos (filtro por marca y modelo)
+GET http://localhost:8080/api/v1/dispositivos?marca=Apple&modelo=iPhone%2013
+
+###
+
+### GET dispositivo por id
+GET http://localhost:8080/api/v1/dispositivos/1
+
+###
+
+### GET dispositivo por id (no existente)
+GET http://localhost:8080/api/v1/dispositivos/999
+
+###
+
+### Crear nuevo dispositivo
+POST http://localhost:8080/api/v1/dispositivos
+Content-Type: application/json
+
+{
+  "marca": "Apple",
+  "modelo": "iPhone 13",
+  "fabricante": "Apple Inc.",
+  "numeroSerie": "333",
+  "tipo": "movil"
+}
+
+###
+
+### Actualizar dispositivo (id = 1)
+PUT http://localhost:8080/api/v1/dispositivos/1
+Content-Type: application/json
+
+{
+  "marca": "Apple",
+  "modelo": "iPhone 13 Pro",
+  "tipo": "movil",
+  "fabricante": "Apple Inc.",
+  "numeroSerie": "111-updated"
+}
+
+###
+
+### Eliminar dispositivo (id = 2)
+DELETE http://localhost:8080/api/v1/dispositivos/2
