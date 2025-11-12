@@ -7,10 +7,15 @@ import org.hibernate.validator.constraints.Length;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-
+@Builder
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class DispositivoCreateDto {
     @NotBlank(message = "La marca es obligatoria")
     @Size(max = 50, message = "La marca no puede tener más de 50 caracteres")

@@ -1,12 +1,13 @@
 package es.danielmc.dispositivos.repositories;
 
 import es.danielmc.dispositivos.models.Dispositivo;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface DispositivosRepository {
+public interface DispositivosRepository extends JpaRepository <Dispositivo, Long> {
     List<Dispositivo> findAll();
 
     List<Dispositivo> findAllById(Long id);

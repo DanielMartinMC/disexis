@@ -13,9 +13,15 @@ public class DispositivosRepositoryImpl implements DispositivosRepository {
 
     private final Map<Long, Dispositivo> Dispositivos = new LinkedHashMap<>(
             Map.of(
-                    1L, new Dispositivo(1L, "Samsung", "Galaxy S21", "123456789", "Samsung Electronics", "movil",
+                    1L, new Dispositivo(1L,
+                            "Samsung",
+                            "Galaxy S21",
+                            "123456789",
+                            "Samsung Electronics",
+                            "movil",
+                            null,
                             LocalDateTime.of(2025,12,31,0,0), LocalDateTime.now(), LocalDateTime.now(), UUID.randomUUID()),
-                    2L, new Dispositivo(2L, "Apple", "iPhone 13", "987654321", "Apple Inc.", "movil",
+                    2L, new Dispositivo(2L, "Apple", "iPhone 13", "987654321", "Apple Inc.", "movil",null,
                             LocalDateTime.of(2025,12,31,0,0), LocalDateTime.now(), LocalDateTime.now(), UUID.randomUUID())
             ));
 
