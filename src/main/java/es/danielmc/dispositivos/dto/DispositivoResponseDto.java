@@ -2,20 +2,26 @@ package es.danielmc.dispositivos.dto;
 
 
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
-
+@Builder
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+
 public class DispositivoResponseDto {
-    private final Long id;
-    private final String marca;
-    private final String modelo;
-    private final String numeroSerie;
-    private final String fabricante;
-    private final String tipo;
-    private final LocalDateTime createdAt;
-    private final LocalDateTime updatedAt;
-    private final UUID uuid;
+    private  Long id;
+    private  String marca;
+    private  String modelo;
+    private  String numeroSerie;
+    private  String fabricante;
+    private  String tipo;
+    private  LocalDateTime createdAt;
+    private  LocalDateTime updatedAt;
+    private  UUID uuid;
 }

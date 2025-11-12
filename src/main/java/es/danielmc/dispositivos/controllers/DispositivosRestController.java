@@ -71,8 +71,4 @@ public class DispositivosRestController {
         dispositivosService.deleteById(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
-
-
-
-
 }
