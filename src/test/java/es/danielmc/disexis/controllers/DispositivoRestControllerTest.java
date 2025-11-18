@@ -1,7 +1,7 @@
 package es.danielmc.disexis.controllers;
 
-import es.danielmc.dispositivos.dto.DispositivoResponseDto;
-import es.danielmc.dispositivos.services.DispositivosService;
+import es.danielmc.rest.dispositivos.dto.DispositivoResponseDto;
+import es.danielmc.rest.dispositivos.services.DispositivosService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -25,7 +25,7 @@ public class DispositivoRestControllerTest {
             .modelo("Modelo1")
             .numeroSerie("1234567890")
             .fabricante("Fabricante1")
-            .tipo("Tipo1")
+            .tipo("Movil")
             .build();
     private final DispositivoResponseDto dispositivoResponse2 = DispositivoResponseDto.builder()
             .id(2L)
@@ -33,7 +33,7 @@ public class DispositivoRestControllerTest {
             .modelo("Modelo2")
             .numeroSerie("0987654321")
             .fabricante("Fabricante2")
-            .tipo("Tipo2")
+            .tipo("Tablet")
             .build();
 
     @Autowired

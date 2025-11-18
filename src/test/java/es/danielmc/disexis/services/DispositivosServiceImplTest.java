@@ -1,20 +1,20 @@
 package es.danielmc.disexis.services;
 
-import es.danielmc.dispositivos.dto.DispositivoCreateDto;
-import es.danielmc.dispositivos.dto.DispositivoResponseDto;
-import es.danielmc.dispositivos.dto.DispositivoUpdateDto;
-import es.danielmc.dispositivos.exeptions.DispositivoNotFound;
-import es.danielmc.dispositivos.mappers.DispositivoMapper;
-import es.danielmc.dispositivos.models.Dispositivo;
-import es.danielmc.dispositivos.repositories.DispositivosRepositoryImpl;
-import es.danielmc.dispositivos.services.DispositivosServiceImpl;
+import es.danielmc.rest.dispositivos.dto.DispositivoCreateDto;
+import es.danielmc.rest.dispositivos.dto.DispositivoResponseDto;
+import es.danielmc.rest.dispositivos.dto.DispositivoUpdateDto;
+import es.danielmc.rest.dispositivos.exeptions.DispositivoBadUuid;
+import es.danielmc.rest.dispositivos.exeptions.DispositivoNotFound;
+import es.danielmc.rest.dispositivos.mappers.DispositivoMapper;
+import es.danielmc.rest.dispositivos.models.Dispositivo;
+import es.danielmc.rest.dispositivos.repositories.DispositivosRepository;
+import es.danielmc.rest.dispositivos.services.DispositivosServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -51,7 +51,7 @@ class DispositivosServiceImplTest {
     private DispositivoResponseDto dispositivoResponseDto1;
 
     @Mock
-    private DispositivosRepositoryImpl dispositivoRepository;
+    private DispositivosRepository dispositivoRepository; // FIX: Usar la interfaz
 
     @Spy
     private DispositivoMapper dispositivoMapper;
@@ -82,7 +82,7 @@ class DispositivosServiceImplTest {
 
 
     }
-    
+
     @Test
     void findAll_ShouldReturnDispositivosByMarca_WhenMarcaParameterProvided(){
         String marca = "Apple";
@@ -121,7 +121,7 @@ class DispositivosServiceImplTest {
 
         DispositivoResponseDto actualDispositivoResponseDto = dispositivosService.findById(id);
 
-        assertEquals(actualDispositivoResponseDto , actualDispositivoResponseDto);
+        assertEquals(expectedDispositivoResponseDto , actualDispositivoResponseDto);
 
         verify(dispositivoRepository, only()).findById(id);
 
@@ -134,7 +134,7 @@ class DispositivosServiceImplTest {
         when(dispositivoRepository.findById(id)).thenReturn(Optional.empty());
 
         var res = assertThrows(DispositivoNotFound.class, () -> dispositivosService.findById(id));
-        assertEquals("Disposositivo con id: " + id + " no encontrado", res.getMessage());
+        assertEquals("Dispositivo con id " + id + " no encontrado", res.getMessage()); // FIX: Corregido el typo en el mensaje
 
         verify(dispositivoRepository, only()).findById(id);
     }
@@ -148,7 +148,7 @@ class DispositivosServiceImplTest {
 
         DispositivoResponseDto actualDispositivoResponseDto = dispositivosService.findbyUuid(expectedUuid.toString());
 
-        assertEquals(actualDispositivoResponseDto , actualDispositivoResponseDto);
+        assertEquals(expectedDispositivoResponseDto , actualDispositivoResponseDto);
 
         verify(dispositivoRepository, only()).findByUuid(expectedUuid);
     }
@@ -158,8 +158,8 @@ class DispositivosServiceImplTest {
 
         String uuid = "1234";
 
-        var res = assertThrows(DispositivoNotFound.class, () -> dispositivosService.findbyUuid(uuid));
-        assertEquals("Disposositivo con uuid: " + uuid + " no encontrado", res.getMessage());
+        var res = assertThrows(DispositivoBadUuid.class, () -> dispositivosService.findbyUuid(uuid)); // FIX: Esperar DispositivoBadUuid
+        assertEquals("UUID: " + uuid + " no válido o de formato incorrecto", res.getMessage()); // FIX: Mensaje de error para UUID no válido
 
         verify(dispositivoRepository, never()).findByUuid(any());
     }
@@ -210,6 +210,7 @@ class DispositivosServiceImplTest {
         when(dispositivoRepository.findById(id)).thenReturn(Optional.of(dispositivo1));
 
         DispositivoUpdateDto dispositivoUpdateDto = DispositivoUpdateDto.builder()
+                 // Asegurar que todos los campos @NotBlank están en el DTO de actualización si se usa el mapper
                 .numeroSerie(numeroSerie)
                 .build();
         Dispositivo dispositivoUpdate = dispositivoMapper.toDispositivo(dispositivoUpdateDto, dispositivo1);
@@ -222,7 +223,7 @@ class DispositivosServiceImplTest {
 
         assertThat(actualDispositivoResponseDto)
                 .usingRecursiveComparison()
-                .ignoringFields("upadtedAt")
+                .ignoringFields("updatedAt") // FIX: Corregido typo
                 .isEqualTo(expectedDispositivoResponseDto);
 
         verify(dispositivoRepository).findById(id);
@@ -238,8 +239,8 @@ class DispositivosServiceImplTest {
                 .build();
         when(dispositivoRepository.findById(id)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> dispositivosService.update(id, dispositivoUpdateDto))
-            .isInstanceOf(DispositivoNotFound.class)
-            .hasMessage("Disposositivo con id: " + id + " no encontrado");
+                .isInstanceOf(DispositivoNotFound.class)
+                .hasMessage("Dispositivo con id " + id + " no encontrado"); // FIX: Corregido el typo en el mensaje
 
         verify(dispositivoRepository, never()).save(any());
         verify(dispositivoRepository).findById(id);
@@ -253,6 +254,7 @@ class DispositivosServiceImplTest {
         assertThatCode(() -> dispositivosService.deleteById(id)).doesNotThrowAnyException();
 
         verify(dispositivoRepository).findById(id);
+        verify(dispositivoRepository).deleteById(id); // FIX: Añadida verificación de deleteById
     }
 
     @Test
@@ -261,10 +263,11 @@ class DispositivosServiceImplTest {
         when(dispositivoRepository.findById(id)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> dispositivosService.deleteById(id))
-            .isInstanceOf(DispositivoNotFound.class)
-            .hasMessage("Disposositivo con id: " + id + " no encontrado");
+                .isInstanceOf(DispositivoNotFound.class)
+                .hasMessage("Dispositivo con id " + id + " no encontrado"); // FIX: Corregido el typo en el mensaje
 
-        verify(dispositivoRepository, never()).findById(id);
+        verify(dispositivoRepository).findById(id); // FIX: Se verifica la llamada a findById
+        verify(dispositivoRepository, never()).deleteById(anyLong()); // Se verifica que deleteById no se llamó
     }
 
 
