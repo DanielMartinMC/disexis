@@ -15,13 +15,14 @@ import java.util.UUID;
 @NoArgsConstructor
 
 public class DispositivoResponseDto {
-    private  Long id;
-    private  String marca;
-    private  String modelo;
-    private  String numeroSerie;
-    private  String fabricante;
-    private  String tipo;
-    private  LocalDateTime createdAt;
-    private  LocalDateTime updatedAt;
-    private  UUID uuid;
+    private Long id;
+    private String marca;
+    private String modelo;
+    private String numeroSerie;
+    private String fabricante;
+    private String tipo;
+    private String titular;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private UUID uuid;
 }

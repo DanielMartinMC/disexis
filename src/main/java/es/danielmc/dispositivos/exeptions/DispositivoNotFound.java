@@ -5,10 +5,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.UUID;
 
-/**
- * Excepción de Dispositivo no encontrado
- * Status 404
- */
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class DispositivoNotFound extends DispositivoException {
     public DispositivoNotFound(Long id) {

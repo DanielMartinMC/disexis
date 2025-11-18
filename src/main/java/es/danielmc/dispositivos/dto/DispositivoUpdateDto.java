@@ -33,5 +33,9 @@ public class DispositivoUpdateDto {
     @NotBlank(message = "El tipo de dispositivo es obligatorio")
     @Size(max = 50, message = "El tipo no puede tener más de 50 caracteres")
     private String tipo;
+
+    @NotBlank(message = "el titular es obligatorio")
+    @Size (max =50, message = "El titular no puede tener más de 50 caracteres")
+    private String titular;
 }
 

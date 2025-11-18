@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface DispositivosService {
-    List<DispositivoResponseDto> findAll(String Marca, String Modelo);
+    List<DispositivoResponseDto> findAll(String marca, String titular);
 
     DispositivoResponseDto findById(Long id);
 

@@ -1,11 +1,12 @@
-package es.danielmc.dispositivos.models;
+package es.danielmc.titulares.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import es.danielmc.dispositivos.models.Dispositivo;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
-
+import java.util.List;
 
 @Builder
 @ToString
@@ -14,27 +15,14 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "DISPOSITIVOS")
-public class Dispositivo {
+@Table(name = "TITULARES")
+public class Titular {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @Column(nullable = false, length = 20)
-    private String marca;
-    
-    @Column(nullable = false, length = 20)
-    private String modelo;
-    
-    @Column(nullable = false, length = 100)
-    private String numeroSerie;
-    
-    @Column(nullable = false, length = 32)
-    private String fabricante;
-    @Column(nullable = false, length = 20)
-    private String tipo;
-    @Column(nullable = false, length = 20)
-    private String titular ;
+
+    @Column(unique = true, nullable = false, length = 20)
+    private String nombre;
 
     @Builder.Default
     @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
@@ -44,11 +32,12 @@ public class Dispositivo {
     @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private LocalDateTime updatedAt = LocalDateTime.now();
 
-    @Column(unique = true, updatable = false, nullable = false)
     @Builder.Default
-    private UUID uuid = UUID.randomUUID();
-
     @Column(columnDefinition = "boolean default false")
-    @Builder.Default
     private Boolean isDeleted = false;
+
+    @OneToMany(mappedBy = "titular")
+    @JsonIgnoreProperties("titular")
+    private List<Dispositivo> dispositivo;
+
 }

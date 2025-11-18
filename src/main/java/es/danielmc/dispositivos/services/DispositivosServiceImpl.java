@@ -9,8 +9,8 @@ import es.danielmc.dispositivos.exeptions.DispositivoNotFound;
 import es.danielmc.dispositivos.mappers.DispositivoMapper;
 import es.danielmc.dispositivos.models.Dispositivo;
 import es.danielmc.dispositivos.repositories.DispositivosRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -20,46 +20,42 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
-
+@Slf4j
 @Service
 @CacheConfig(cacheNames = {"dispositivos"})
+@RequiredArgsConstructor
 public class DispositivosServiceImpl implements DispositivosService {
-    private final Logger logger = LoggerFactory.getLogger(DispositivosServiceImpl.class);
     private final DispositivosRepository dispositivosRepository;
     private final DispositivoMapper dispositivoMapper;
 
-    @Autowired
-    public DispositivosServiceImpl(DispositivosRepository dispositivosRepository, DispositivoMapper dispositivoMapper) {
-        this.dispositivosRepository = dispositivosRepository;
-        this.dispositivoMapper = dispositivoMapper;
-    }
+   
 
     @Override
-    public List<DispositivoResponseDto> findAll(String Marca, String Modelo) {
+    public List<DispositivoResponseDto> findAll(String marca, String titular) {
         // Si todo está vacío o nulo, devolvemos todos los dispositivos
-        if ((Marca == null || Marca.isEmpty()) && (Modelo == null || Modelo.isEmpty())) {
-            logger.info("Buscando todos los dispositivos");
+        if ((marca == null || marca.isEmpty()) && (titular == null || titular.isEmpty())) {
+            log.info("Buscando todos los dispositivos");
             return dispositivoMapper.toDispositivoResponseDto(dispositivosRepository.findAll());
         }
         // Si la marca no está vacía, pero la categoría si, buscamos por marca
-        if ((Marca != null && !Marca.isEmpty()) && (Modelo == null || Modelo.isEmpty())) {
-            logger.info("Buscando productos por marca: " + Marca);
-            return dispositivoMapper.toDispositivoResponseDto(dispositivosRepository.findAllByMarca(Marca));
+        if ((marca != null && !marca.isEmpty()) && (titular == null || titular.isEmpty())) {
+            log.info("Buscando productos por marca: " + marca);
+            return dispositivoMapper.toDispositivoResponseDto(dispositivosRepository.findByMarca(marca));
         }
         // Si la marca está vacía, pero la categoría no, buscamos por categoría
-        if (Marca == null || Marca.isEmpty()) {
-            logger.info("Buscando productos por categoría: " + Modelo);
-            return dispositivoMapper.toDispositivoResponseDto(dispositivosRepository.findAllByModelo(Modelo));
+        if (marca == null || marca.isEmpty()) {
+            log.info("Buscando productos por categoría: " + titular);
+            return dispositivoMapper.toDispositivoResponseDto(dispositivosRepository.findByTitularContainsIgnoreCase( titular));
         }
         // Si la marca y la categoría no están vacías, buscamos por ambas
-        logger.info("Buscando productos por marca: " + Marca + " y categoría: " + Modelo);
-        return dispositivoMapper.toDispositivoResponseDto(dispositivosRepository.findAllByMarcaAndModelo(Marca, Modelo));
+        log.info("Buscando productos por marca: " + marca + " y categoría: " + titular);
+        return dispositivoMapper.toDispositivoResponseDto(dispositivosRepository.findByMarcaAndTitularContainsIgnoreCase(marca, titular));
     }
 
     @Override
-    @Cacheable
+    @Cacheable(key = "#id")
     public DispositivoResponseDto findById(Long id) {
-        logger.info("Buscando producto por id: " + id);
+        log.info("Buscando producto por id: " + id);
         return dispositivoMapper.toDispositivoResponseDto(dispositivosRepository.findById(id)
                 .orElseThrow(() -> new DispositivoNotFound(id)));
     }
@@ -67,8 +63,15 @@ public class DispositivosServiceImpl implements DispositivosService {
     @Override
     @Cacheable
     public DispositivoResponseDto findbyUuid(String uuid) {
-        logger.info("Buscando producto por uuid: " + uuid);
-        var myUuid = UUID.fromString(uuid);
+        log.info("Buscando producto por uuid: " + uuid);
+        UUID myUuid;
+        // FIX: Se añade try-catch para lanzar la excepción correcta en caso de UUID no válido
+        try {
+            myUuid = UUID.fromString(uuid);
+        } catch (IllegalArgumentException e) {
+            throw new DispositivoBadUuid(uuid);
+        }
+
         return dispositivoMapper.toDispositivoResponseDto(dispositivosRepository.findByUuid(myUuid).orElseThrow(
                 () -> new DispositivoNotFound(myUuid)
         ));
@@ -77,11 +80,10 @@ public class DispositivosServiceImpl implements DispositivosService {
     @CachePut
     @Override
     public DispositivoResponseDto save(DispositivoCreateDto dispositivoCreateDto) {
-        logger.info("Guardando producto: " + dispositivoCreateDto);
+        log.info("Guardando producto: " + dispositivoCreateDto);
         // obtenemos el id de producto
-        Long id = dispositivosRepository.nextId();
         // Creamos el producto nuevo con los datos que nos vienen del dto, podríamos usar el mapper
-        Dispositivo nuevoDispositivo = dispositivoMapper.toDispositivo(id, dispositivoCreateDto);
+        Dispositivo nuevoDispositivo = dispositivoMapper.toDispositivo(dispositivoCreateDto);
         // Lo guardamos en el repositorio
         return dispositivoMapper.toDispositivoResponseDto(dispositivosRepository.save(nuevoDispositivo));
     }
@@ -89,7 +91,7 @@ public class DispositivosServiceImpl implements DispositivosService {
     @CachePut
     @Override
     public DispositivoResponseDto update(Long id, DispositivoUpdateDto dispositivoUpdateDto) {
-        logger.info("Actualizando producto por id: " + id);
+        log.info("Actualizando producto por id: " + id);
         // Si no existe lanza excepción, por eso ya llamamos a lo que hemos implementado antes
         var dispositivoActual = dispositivosRepository.findById(id).orElseThrow(() -> new DispositivoNotFound(id));
         // Actualizamos el producto con los datos que nos vienen del dto, podríamos usar el mapper
@@ -101,7 +103,7 @@ public class DispositivosServiceImpl implements DispositivosService {
     @Override
     @CacheEvict
     public void deleteById(Long id) {
-        logger.debug("Borrando producto por id: " + id);
+        log.debug("Borrando producto por id: " + id);
         // Si no existe lanza excepción, por eso ya llamamos a lo que hemos implementado antes
         this.findById(id);
         // Lo borramos del repositorio

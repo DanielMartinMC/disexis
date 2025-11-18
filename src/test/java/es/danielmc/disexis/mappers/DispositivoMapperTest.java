@@ -27,7 +27,7 @@ class DispositivoMapperTest {
                 .modelo("iPhone 13")
                 .numeroSerie("SN123456789")
                 .fabricante("Apple Inc.")
-                .tipo("Smartphone")
+                .tipo("Movil")
                 .build();
         // Act
         var res = dispositivoMapper.toDispositivo(id, dispositivoCreateDto);
@@ -52,7 +52,7 @@ class DispositivoMapperTest {
                 .modelo("Galaxy S21")
                 .numeroSerie("SN987654321")
                 .fabricante("Samsung Electronics")
-                .tipo("Smartphone")
+                .tipo("Movil")
                 .build();
 
         Dispositivo dispositivo = Dispositivo.builder()
@@ -61,6 +61,7 @@ class DispositivoMapperTest {
                 .modelo(dispositivoUpdateDto.getModelo())
                 .numeroSerie(dispositivoUpdateDto.getNumeroSerie())
                 .fabricante(dispositivoUpdateDto.getFabricante())
+                .tipo(dispositivoUpdateDto.getTipo())
                 .build();
         // Act
         var res = dispositivoMapper.toDispositivo(dispositivoUpdateDto, dispositivo);
@@ -84,7 +85,7 @@ class DispositivoMapperTest {
                 .modelo("Galaxy S21")
                 .numeroSerie("SN987654321")
                 .fabricante("Samsung Electronics")
-                .tipo("Smartphone")
+                .tipo("Movil")
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .uuid(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"))

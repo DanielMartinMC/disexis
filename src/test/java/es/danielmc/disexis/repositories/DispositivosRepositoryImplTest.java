@@ -1,11 +1,9 @@
 package es.danielmc.disexis.repositories;
 
 import es.danielmc.dispositivos.models.Dispositivo;
-import es.danielmc.dispositivos.repositories.DispositivosRepositoryImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -24,7 +22,7 @@ public class DispositivosRepositoryImplTest {
             .tipo("Tablet")
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
-            .uuid(UUID.randomUUID())
+            .uuid(UUID.fromString("57727bc2-0c1c-494e-bbaf-e952a778e478"))
             .build();
 
     private final Dispositivo dispositivo2 = Dispositivo.builder()
@@ -36,7 +34,7 @@ public class DispositivosRepositoryImplTest {
             .tipo("Movil")
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
-            .uuid(UUID.randomUUID())
+            .uuid(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"))
             .build();
 
     private DispositivosRepositoryImpl repository;
@@ -137,7 +135,7 @@ public class DispositivosRepositoryImplTest {
     @Test
 
     void findByUuid_nonExistingUuid_returnEmptyOptional() {
-        UUID uuid = UUID.fromString("12345bc2-0c1c-494e-bbaf-e952a778e478");
+        UUID uuid = UUID.fromString("12325bc2-0c1c-494e-bbaf-e952a778e478");
         Optional<Dispositivo> dispositivo = repository.findByUuid(uuid);
 
         assertAll("findByUuid",
