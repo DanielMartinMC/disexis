@@ -44,10 +44,9 @@ public class DispositivosServiceImpl implements DispositivosService, Initializin
     private WebSocketHandler webSocketService;
 
     public void afterPropertiesSet() {
-        this.webSocketService = this.webSocketConfig.webSocketTarjetasHandler();
+        this.webSocketService = this.webSocketConfig.webSocketDispositivosHandler();
     }
 
-    // Para que en los test se pueda inicializar
     public void setWebSocketService(WebSocketHandler webSocketHandler) {
         this.webSocketService = webSocketHandler;
     }
@@ -129,14 +128,18 @@ public class DispositivosServiceImpl implements DispositivosService, Initializin
         return dispositivoMapper.toDispositivoResponseDto(dispositivoUpdated);
     }
 
+    @CacheEvict(key = "#id")
     @Override
-    @CacheEvict
     public void deleteById(Long id) {
-        log.debug("Borrando producto por id: " + id);
-        // Si no existe lanza excepción, por eso ya llamamos a lo que hemos implementado antes
-        this.findById(id);
-        // Lo borramos del repositorio
+        log.debug("Borrando tarjeta por id: {}", id);
+        // Si no existe lanza excepción
+        Dispositivo dispositivoDeleted = dispositivosRepository.findById(id).orElseThrow(()-> new DispositivoNotFound(id));
+        // La borramos del repositorio si existe
         dispositivosRepository.deleteById(id);
+        // O lo marcamos como borrado, para evitar problemas de cascada
+        //tarjetasRepository.updateIsDeletedToTrueById(id);
+        // Enviamos la notificación a los clientes ws
+        onChange(Notificacion.Tipo.DELETE, dispositivoDeleted);
 
     }
 
@@ -145,7 +148,7 @@ public class DispositivosServiceImpl implements DispositivosService, Initializin
 
         if (webSocketService == null) {
             log.warn("No se ha podido enviar la notificación a los clientes ws, no se ha encontrado el servicio");
-            webSocketService = this.webSocketConfig.webSocketTarjetasHandler();
+            webSocketService = this.webSocketConfig.webSocketDispositivosHandler();
         }
 
         try {
