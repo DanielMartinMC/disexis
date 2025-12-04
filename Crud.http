@@ -31,23 +31,38 @@ GET http://localhost:3000/api/v1/dispositivos/1
 GET http://localhost:3000/api/v1/dispositivos/999
 
 ###
+PUT http://localhost:3000/api/v1/dispositivos/1
+Content-Type: application/json
+
+{
+  "id": 1,
+  "marca": "Xiamoi",
+  "modelo": "Redmi Note 11",
+  "fabricante": "Xiamoi Corp.",
+  "numeroSerie": "111-updated",
+  "tipo": "movil",
+  "titular": "Carlos"
+
+}
 
 ### Crear nuevo dispositivo
 POST http://localhost:3000/api/v1/dispositivos
 Content-Type: application/json
 
 {
+
   "marca": "Apple",
   "modelo": "iPhone 13",
   "fabricante": "Apple Inc.",
   "numeroSerie": "333",
-  "tipo": "movil"
+  "tipo": "movil",
+  "titular": "Daniel"
 }
 
 ###
 
 ### Actualizar dispositivo (id = 1)
-PATCH http://localhost:3000/api/v1/dispositivos/2
+PATCH http://localhost:3000/api/v1/dispositivos/1
 Content-Type: application/json
 
 {
@@ -55,7 +70,8 @@ Content-Type: application/json
   "modelo": "iPhone 13 Pro",
   "tipo": "movil",
   "fabricante": "Apple Inc.",
-  "numeroSerie": "111-updated"
+  "numeroSerie": "111-updated",
+  "titular": "Jose Carlos"
 }
 
 ###

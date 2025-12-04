@@ -195,7 +195,7 @@ class DispositivosServiceImplTest {
         when(titularesService.findByNombre(dispositivoCreateDto.getTitular())).thenReturn(titular);
         when(dispositivoRepository.save(any(Dispositivo.class))).thenReturn(expectedDispositivo);
         // Mock del WebSocket para evitar error en onChange
-        when(webSocketConfig.webSocketTarjetasHandler()).thenReturn(webSocketHandler);
+        when(webSocketConfig.webSocketDispositivosHandler()).thenReturn(webSocketHandler);
 
         DispositivoResponseDto actualDispositivoResponseDto = dispositivosService.save(dispositivoCreateDto);
 
@@ -224,7 +224,7 @@ class DispositivosServiceImplTest {
         Dispositivo dispositivoUpdated = dispositivoMapper.toDispositivo(dispositivoUpdateDto, dispositivo1);
         when(dispositivoRepository.save(any(Dispositivo.class))).thenReturn(dispositivoUpdated);
         // Mock del WebSocket
-        when(webSocketConfig.webSocketTarjetasHandler()).thenReturn(webSocketHandler);
+        when(webSocketConfig.webSocketDispositivosHandler()).thenReturn(webSocketHandler);
 
         dispositivoResponseDto1.setNumeroSerie(numeroSerie);
         DispositivoResponseDto expectedDispositivoResponseDto = dispositivoResponseDto1;
