@@ -4,6 +4,7 @@ import es.danielmc.dispositivos.dto.DispositivoCreateDto;
 import es.danielmc.dispositivos.dto.DispositivoResponseDto;
 import es.danielmc.dispositivos.dto.DispositivoUpdateDto;
 import es.danielmc.dispositivos.models.Dispositivo;
+import es.danielmc.titulares.models.Titular;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -13,7 +14,7 @@ import java.util.UUID;
 // FIX: Se eliminan las anotaciones redundantes de Lombok para el constructor.
 @Component
 public class DispositivoMapper {
-    public Dispositivo toDispositivo(DispositivoCreateDto dispositivoCreateDto) {
+    public Dispositivo toDispositivo(DispositivoCreateDto dispositivoCreateDto, Titular titular) {
         return Dispositivo.builder()
                 .id(null)
                 .marca(dispositivoCreateDto.getMarca())
@@ -21,7 +22,7 @@ public class DispositivoMapper {
                 .numeroSerie(dispositivoCreateDto.getNumeroSerie())
                 .fabricante(dispositivoCreateDto.getFabricante())
                 .tipo(dispositivoCreateDto.getTipo())
-                .titular(dispositivoCreateDto.getTitular())
+                .titular(titular)
                 .uuid(UUID.randomUUID())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
@@ -39,7 +40,7 @@ public class DispositivoMapper {
                 .numeroSerie(dispositivoUpdateDto.getNumeroSerie() != null ? dispositivoUpdateDto.getNumeroSerie() : dispositivo.getNumeroSerie())
                 .fabricante(dispositivoUpdateDto.getFabricante() != null ? dispositivoUpdateDto.getFabricante() : dispositivo.getFabricante())
                 .tipo(dispositivoUpdateDto.getTipo() != null ? dispositivoUpdateDto.getTipo() : dispositivo.getTipo()) // FIX: Añadida la lógica para el campo 'tipo'
-                .titular(dispositivoUpdateDto.getTitular() != null ? dispositivoUpdateDto.getTitular() : dispositivo.getTitular())
+                .titular(dispositivo.getTitular())
                 .createdAt(dispositivo.getCreatedAt())
                 .updatedAt(LocalDateTime.now())
                 .uuid(dispositivo.getUuid())
@@ -55,7 +56,7 @@ public class DispositivoMapper {
                 .numeroSerie(dispositivo.getNumeroSerie())
                 .fabricante(dispositivo.getFabricante())
                 .tipo(dispositivo.getTipo())
-                .titular(dispositivo.getTitular())
+                .titular(dispositivo.getTitular().getNombre())
                 .createdAt(dispositivo.getCreatedAt())
                 .updatedAt(dispositivo.getUpdatedAt())
                 .uuid(dispositivo.getUuid())

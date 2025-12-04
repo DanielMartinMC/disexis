@@ -1,5 +1,6 @@
 package es.danielmc.dispositivos.models;
 
+import es.danielmc.titulares.models.Titular;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -33,8 +34,6 @@ public class Dispositivo {
     private String fabricante;
     @Column(nullable = false, length = 20)
     private String tipo;
-    @Column(nullable = false, length = 20)
-    private String titular ;
 
     @Builder.Default
     @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
@@ -51,4 +50,8 @@ public class Dispositivo {
     @Column(columnDefinition = "boolean default false")
     @Builder.Default
     private Boolean isDeleted = false;
+
+    @ManyToOne
+    @JoinColumn(name = "titular_id") // Así se va a llamar en la BD
+    private Titular titular;
 }
