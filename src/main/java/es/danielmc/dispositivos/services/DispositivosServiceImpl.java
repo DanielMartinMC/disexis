@@ -1,7 +1,10 @@
 package es.danielmc.dispositivos.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import es.danielmc.config_websockets.WebSocketConfig;
+import es.danielmc.config_websockets.WebSocketHandler;
 import es.danielmc.dispositivos.dto.DispositivoCreateDto;
-/*import es.danielmc.dispositivos.exceptions.ProductoNotFound; */
 import es.danielmc.dispositivos.dto.DispositivoResponseDto;
 import es.danielmc.dispositivos.dto.DispositivoUpdateDto;
 import es.danielmc.dispositivos.exeptions.DispositivoBadUuid;
@@ -9,26 +12,45 @@ import es.danielmc.dispositivos.exeptions.DispositivoNotFound;
 import es.danielmc.dispositivos.mappers.DispositivoMapper;
 import es.danielmc.dispositivos.models.Dispositivo;
 import es.danielmc.dispositivos.repositories.DispositivosRepository;
+import es.danielmc.notification_websockets.dto.DispositivoNotificationResponse;
+import es.danielmc.notification_websockets.mapppers.DispositivoNotificationMapper;
+import es.danielmc.notification_websockets.models.Notificacion;
+import es.danielmc.titulares.services.TitularesService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 @Slf4j
 @Service
 @CacheConfig(cacheNames = {"dispositivos"})
 @RequiredArgsConstructor
-public class DispositivosServiceImpl implements DispositivosService {
+public class DispositivosServiceImpl implements DispositivosService, InitializingBean {
     private final DispositivosRepository dispositivosRepository;
     private final DispositivoMapper dispositivoMapper;
+    private final TitularesService titularesService;
 
-   
+
+    private final WebSocketConfig webSocketConfig;
+    private final ObjectMapper objectMapper;
+    private final DispositivoNotificationMapper dispositivoNotificationMapper;
+    private WebSocketHandler webSocketService;
+
+    public void afterPropertiesSet() {
+        this.webSocketService = this.webSocketConfig.webSocketTarjetasHandler();
+    }
+
+    // Para que en los test se pueda inicializar
+    public void setWebSocketService(WebSocketHandler webSocketHandler) {
+        this.webSocketService = webSocketHandler;
+    }
 
     @Override
     public List<DispositivoResponseDto> findAll(String marca, String titular) {
@@ -77,27 +99,34 @@ public class DispositivosServiceImpl implements DispositivosService {
         ));
     }
 
-    @CachePut
+    @CachePut(key = "#result.id")
     @Override
     public DispositivoResponseDto save(DispositivoCreateDto dispositivoCreateDto) {
-        log.info("Guardando producto: " + dispositivoCreateDto);
-        // obtenemos el id de producto
-        // Creamos el producto nuevo con los datos que nos vienen del dto, podríamos usar el mapper
-        Dispositivo nuevoDispositivo = dispositivoMapper.toDispositivo(dispositivoCreateDto);
-        // Lo guardamos en el repositorio
-        return dispositivoMapper.toDispositivoResponseDto(dispositivosRepository.save(nuevoDispositivo));
+        log.info("Guardando tarjeta: {}", dispositivoCreateDto);
+        // Buscamos el titular por su nombre
+        var titular = titularesService.findByNombre(dispositivoCreateDto.getTitular());
+        // Creamos la tarjeta nueva con los datos que nos vienen y la guardamos en el repositorio
+        Dispositivo dispositivoSaved = dispositivosRepository.save(
+                dispositivoMapper.toDispositivo(dispositivoCreateDto, titular));
+        // Enviamos la notificación a los clientes ws
+        onChange(Notificacion.Tipo.CREATE, dispositivoSaved);
+        // La guardamos en el repositorio
+        return dispositivoMapper.toDispositivoResponseDto(dispositivoSaved);
     }
 
-    @CachePut
+    @CachePut(key = "#result.id")
     @Override
     public DispositivoResponseDto update(Long id, DispositivoUpdateDto dispositivoUpdateDto) {
-        log.info("Actualizando producto por id: " + id);
-        // Si no existe lanza excepción, por eso ya llamamos a lo que hemos implementado antes
-        var dispositivoActual = dispositivosRepository.findById(id).orElseThrow(() -> new DispositivoNotFound(id));
-        // Actualizamos el producto con los datos que nos vienen del dto, podríamos usar el mapper
-        Dispositivo productoActualizado = dispositivoMapper.toDispositivo(dispositivoUpdateDto, dispositivoActual);
-        // Lo guardamos en el repositorio
-        return dispositivoMapper.toDispositivoResponseDto(dispositivosRepository.save(productoActualizado));
+        log.info("Actualizando tarjeta por id: {}", id);
+        // Si no existe lanza excepción
+        var dispositivoActual = dispositivosRepository.findById(id).orElseThrow(()-> new DispositivoNotFound(id));
+        // Actualizamos la tarjeta con los datos que nos vienen y la guardamos en el repositorio
+        Dispositivo dispositivoUpdated =  dispositivosRepository.save(
+                dispositivoMapper.toDispositivo(dispositivoUpdateDto, dispositivoActual));
+        // Enviamos la notificación a los clientes ws
+        onChange(Notificacion.Tipo.UPDATE, dispositivoUpdated);
+        // La guardamos en el repositorio
+        return dispositivoMapper.toDispositivoResponseDto(dispositivoUpdated);
     }
 
     @Override
@@ -109,5 +138,42 @@ public class DispositivosServiceImpl implements DispositivosService {
         // Lo borramos del repositorio
         dispositivosRepository.deleteById(id);
 
+    }
+
+    void onChange(Notificacion.Tipo tipo, Dispositivo data) {
+        log.debug("Servicio de productos onChange con tipo: {} y datos: {}", tipo, data);
+
+        if (webSocketService == null) {
+            log.warn("No se ha podido enviar la notificación a los clientes ws, no se ha encontrado el servicio");
+            webSocketService = this.webSocketConfig.webSocketTarjetasHandler();
+        }
+
+        try {
+            Notificacion<DispositivoNotificationResponse> notificacion = new Notificacion<>(
+                    "DISPOSITIVO",
+                    tipo,
+                    dispositivoNotificationMapper.toDispositivoNotificationDto(data),
+                    LocalDateTime.now().toString()
+            );
+
+            String json = objectMapper.writeValueAsString((notificacion));
+
+            log.info("Enviando mensaje a los clientes ws");
+            // Enviamos el mensaje a los clientes ws con un hilo, si hay muchos clientes, puede tardar.
+            // No bloqueamos el hilo principal que atiende las peticiones http
+            Thread senderThread = new Thread(() -> {
+                try {
+                    webSocketService.sendMessage(json);
+                } catch (Exception e) {
+                    log.error("Error al enviar el mensaje a través del servicio WebSocket", e);
+                }
+            });
+            senderThread.setName("WebSocketTarjeta-" + data.getId());
+            senderThread.setDaemon(true); // Para que no impida que la aplicación se cierre
+            senderThread.start();
+            log.info("Hilo de websocket iniciado: {}", data.getId());
+        } catch (JsonProcessingException e) {
+            log.error("Error al convertir la notificación a JSON", e);
+        }
     }
 }

@@ -15,11 +15,14 @@ public interface DispositivosRepository extends JpaRepository<Dispositivo, Long>
     
     List<Dispositivo> findAllByMarcaAndTitular(String marca, String titular);
 
+    @Query("SELECT d from Dispositivo d where LOWER(d.titular.nombre) like %:titular%")
     List<Dispositivo> findByTitularContainsIgnoreCase(String titular);
 
     List<Dispositivo> findByMarcaContainsIgnoreCaseAndIsDeletedFalse(String marca);
+
+    @Query("SELECT d from Dispositivo d where LOWER(d.titular.nombre) like %:titular% and LOWER(d.marca) like %:marca%")
     List<Dispositivo> findByMarcaAndTitularContainsIgnoreCase(String marca, String titular);
-    
+
     List<Dispositivo> findByMarcaAndTitularContainsIgnoreCaseAndIsDeletedFalse(String marca, String titular);
     
     Optional<Dispositivo> findByUuid(UUID uuid);
