@@ -1,4 +1,4 @@
-package es.danielmc.dispositivos.exeptions;
+package es.danielmc.dispositivos.exceptions;
 
 
 public class DispositivoBadRequest extends DispositivoException {
