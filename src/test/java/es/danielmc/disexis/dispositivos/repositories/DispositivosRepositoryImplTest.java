@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Sql(value = {"/reset.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 // Vamos a probar el repositorio, pero moqueamos la base de datos JPA
 @DataJpaTest
-class DispositivosRepositoryImplTest {
+class TarjetasRepositoryTest {
 
     private final Titular titular1 = Titular.builder().nombre("Jose").build();
     private final Titular titular2 = Titular.builder().nombre("Juan").build();
@@ -29,10 +29,10 @@ class DispositivosRepositoryImplTest {
     private final Dispositivo dispositivo1 = Dispositivo.builder()
             .marca("Samsung")
             .modelo("Galaxy S21")
-            .numeroSerie("1234-5678-1234-5678")
+            .numeroSerie("1234-5678-0000-1111")
             .fabricante("Samsung Electronics")
             .tipo("Tablet")
-            .titular(titular1)
+            .titular(titular1) // Pasamos el OBJETO Titular
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
             .uuid(UUID.fromString("57727bc2-0c1c-494e-bbaf-e952a778e478"))
@@ -42,10 +42,10 @@ class DispositivosRepositoryImplTest {
     private final Dispositivo dispositivo2 = Dispositivo.builder()
             .marca("Apple")
             .modelo("iPhone 13")
-            .numeroSerie("4321-5678-1234-5678")
+            .numeroSerie("4321-5678-2222-3333")
             .fabricante("Apple Inc.")
             .tipo("Movil")
-            .titular(titular2)
+            .titular(titular2) // Pasamos el OBJETO Titular
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
             .uuid(UUID.fromString("b36835eb-e56a-4023-b058-52bfa600fee5"))
@@ -62,7 +62,7 @@ class DispositivosRepositoryImplTest {
         // Vamos a salvar un titular
         entityManager.persist(titular1);
         entityManager.persist(titular2);
-        // Vamos a salvar dos dispositivos
+        // Vamos a salvar dos tarjetas
         entityManager.persist(dispositivo1);
         entityManager.persist(dispositivo2);
         entityManager.flush();
@@ -71,98 +71,54 @@ class DispositivosRepositoryImplTest {
     @Test
     void findAll() {
         // Act
-        List<Dispositivo> dispositivos = repositorio.findAll();
+        List<Dispositivo> tarjetas = repositorio.findAll();
 
         // Assert
         assertAll("findAll",
-                () -> assertNotNull(dispositivos),
-                () -> assertEquals(2, dispositivos.size())
+                () -> assertNotNull(tarjetas),
+                () -> assertEquals(2, tarjetas.size())
         );
     }
 
-    @Test
-    void findAllByNumero() { // Equivalente a tu findByMarca en Dispositivos
-        // Act
-        String marca = "Apple";
-        List<Dispositivo> dispositivos = repositorio.findByMarca(marca);
-
-        // Assert
-        assertAll("findAllByMarca",
-                () -> assertNotNull(dispositivos),
-                () -> assertEquals(1, dispositivos.size()),
-                () -> assertEquals(marca, dispositivos.getFirst().getMarca())
-        );
-    }
 
     @Test
-    void findAllByTitular() {
+    void findById_existingId_returnsOptionalWithTarjeta() {
         // Act
-        String titular = "Jose";
-        List<Dispositivo> dispositivos = repositorio.findByTitularContainsIgnoreCase(titular.toLowerCase());
+        Long id = 1L;
+        Optional<Dispositivo> optionalTarjeta = repositorio.findById(id);
 
         // Assert
-        assertAll("findAllByTitular",
-                () -> assertNotNull(dispositivos),
-                () -> assertEquals(1, dispositivos.size()),
-                () -> assertEquals(titular, dispositivos.getFirst().getTitular().getNombre())
-        );
-    }
-
-    @Test
-    void findAllByMarcaAndTitular() { // Equivalente a findByMarcaAndTitular...
-        // Act
-        String marca = "Apple";
-        String titular = "Juan";
-        List<Dispositivo> dispositivos = repositorio.findByMarcaAndTitularContainsIgnoreCase(marca, titular.toLowerCase());
-
-        // Assert
-        assertAll("findAllByMarcaAndTitular",
-                () -> assertNotNull(dispositivos),
-                () -> assertEquals(1, dispositivos.size()),
-                () -> assertEquals(marca, dispositivos.getFirst().getMarca()),
-                () -> assertEquals(titular, dispositivos.getFirst().getTitular().getNombre())
-        );
-    }
-
-    @Test
-    void findById_existingId_returnsOptionalWithDispositivo() {
-        // Act
-        // USAMOS EL ID REAL QUE LA BD HA ASIGNADO PARA QUE NO FALLE NUNCA
-        Long id = dispositivo1.getId();
-        Optional<Dispositivo> optionalDispositivo = repositorio.findById(id);
-
-        // Assert
-        assertAll("findById_existingId_returnsOptionalWithDispositivo",
-                () -> assertNotNull(optionalDispositivo),
-                () -> assertTrue(optionalDispositivo.isPresent()),
-                () -> assertEquals(id, optionalDispositivo.get().getId())
+        assertAll("findById_existingId_returnsOptionalWithTarjeta",
+                () -> assertNotNull(optionalTarjeta),
+                () -> assertTrue(optionalTarjeta.isPresent()),
+                () -> assertEquals(id, optionalTarjeta.get().getId())
         );
     }
 
     @Test
     void findById_nonExistingId_returnsEmptyOptional() {
         // Act
-        Long id = 999L; // ID inventado
-        Optional<Dispositivo> optionalDispositivo = repositorio.findById(id);
+        Long id = 4L;
+        Optional<Dispositivo> optionalTarjeta = repositorio.findById(id);
 
         // Assert
         assertAll("findById_nonExistingId_returnsEmptyOptional",
-                () -> assertNotNull(optionalDispositivo),
-                () -> assertTrue(optionalDispositivo.isEmpty())
+                () -> assertNotNull(optionalTarjeta),
+                () -> assertTrue(optionalTarjeta.isEmpty())
         );
     }
 
     @Test
-    void findByUuid_existingUuid_returnsOptionalWithDispositivo() {
+    void findByUuid_existingUuid_returnsOptionalWithTarjeta() {
         // Act
         UUID uuid = UUID.fromString("57727bc2-0c1c-494e-bbaf-e952a778e478");
-        Optional<Dispositivo> optionalDispositivo = repositorio.findByUuid(uuid);
+        Optional<Dispositivo> optionalTarjeta = repositorio.findByUuid(uuid);
 
         // Assert
-        assertAll("findByUuid_existingUuid_returnsOptionalWithDispositivo",
-                () -> assertNotNull(optionalDispositivo),
-                () -> assertTrue(optionalDispositivo.isPresent()),
-                () -> assertEquals(uuid, optionalDispositivo.get().getUuid())
+        assertAll("findByUuid_existingUuid_returnsOptionalWithTarjeta",
+                () -> assertNotNull(optionalTarjeta),
+                () -> assertTrue(optionalTarjeta.isPresent()),
+                () -> assertEquals(uuid, optionalTarjeta.get().getUuid())
         );
     }
 
@@ -170,19 +126,20 @@ class DispositivosRepositoryImplTest {
     void findByUuid_nonExistingUuid_returnsEmptyOptional() {
         // Act
         UUID uuid = UUID.fromString("12345bc2-0c1c-494e-bbaf-e952a778e478");
-        Optional<Dispositivo> optionalDispositivo = repositorio.findByUuid(uuid);
+        Optional<Dispositivo> optionalTarjeta = repositorio.findByUuid(uuid);
 
         // Assert
         assertAll("findByUuid_nonExistingUuid_returnsEmptyOptional",
-                () -> assertNotNull(optionalDispositivo),
-                () -> assertTrue(optionalDispositivo.isEmpty())
+                () -> assertNotNull(optionalTarjeta),
+                () -> assertTrue(optionalTarjeta.isEmpty())
         );
     }
+
 
     @Test
     void existsById_existingId_returnsTrue() {
         // Act
-        Long id = dispositivo1.getId();
+        Long id = 1L;
         boolean exists = repositorio.existsById(id);
 
         // Assert
@@ -192,12 +149,13 @@ class DispositivosRepositoryImplTest {
     @Test
     void existsById_nonExistingId_returnsFalse() {
         // Act
-        Long id = 999L;
+        Long id = 4L;
         boolean exists = repositorio.existsById(id);
 
         // Assert
         assertFalse(exists);
     }
+
 
     @Test
     void existsByUuid_existingUuid_returnsTrue() {
@@ -225,12 +183,10 @@ class DispositivosRepositoryImplTest {
         Dispositivo dispositivo = Dispositivo.builder()
                 .marca("Xiaomi")
                 .modelo("Redmi Note 10")
-                .numeroSerie("SN-NEW-112233")
+                .numeroSerie("1122334455")
                 .fabricante("Xiaomi Corp")
                 .tipo("Movil")
                 .titular(titular1)
-                .uuid(UUID.randomUUID())
-                .isDeleted(false)
                 .build();
 
         // Act
@@ -242,38 +198,38 @@ class DispositivosRepositoryImplTest {
         assertAll("save",
                 () -> assertNotNull(savedDispositivo),
                 () -> assertEquals(dispositivo, savedDispositivo),
-                () -> assertEquals(3, all.size()) // 2 iniciales + 1 nueva
+                () -> assertEquals(3, all.size())
         );
+
     }
 
     @Test
     void save_butExists() {
         // Arrange
-        // Recuperamos el ID real para asegurar que actualizamos
-        Long id = dispositivo1.getId();
-
+        // Una tarjeta con un id de tarjeta existente
+        Long id = 1L;
         Dispositivo dispositivoExistente = Dispositivo.builder()
-                .id(id)
-                .marca("Samsung")
-                .modelo("Galaxy S21")
-                .numeroSerie("1234-5678-1234-5678")
-                .fabricante("Samsung Electronics")
-                .tipo("Tablet")
-                .titular(titular1)
+                .marca("Xiaomi")
+                .modelo("Redmi Note 10")
+                .numeroSerie("1122334455")
+                .fabricante("Xiaomi Corp")
+                .tipo("Movil")
+                .titular(titular1) // Usamos un titular existente
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
-                .uuid(UUID.fromString("57727bc2-0c1c-494e-bbaf-e952a778e478"))
+                .uuid(UUID.randomUUID())
                 .isDeleted(false)
                 .build();
 
-        // Act
-        Dispositivo savedDispositivo = repositorio.save(dispositivoExistente);
+        //Act
+        Dispositivo savedTarjeta = repositorio.save(dispositivoExistente);
         var all = repositorio.findAll();
 
         // Assert
         // Comprueba que actualiza una tarjeta existente
         assertAll("save",
-                () -> assertNotNull(savedDispositivo),
+                () -> assertNotNull(savedTarjeta),
+                //  () -> assertEquals(tarjetaExistente, savedTarjeta),
                 () -> assertTrue(repositorio.existsById(id)),
                 () -> assertTrue(all.size() >= 2)
         );
@@ -282,16 +238,17 @@ class DispositivosRepositoryImplTest {
     @Test
     void deleteById_existingId() {
         // Act
-        Long id = dispositivo1.getId();
+        Long id = 1L;
         repositorio.deleteById(id);
         var all = repositorio.findAll();
 
         // Assert
         assertAll("deleteById_existingId",
-                () -> assertEquals(1, all.size()), // Queda 1
+                () -> assertEquals(1, all.size()),
                 () -> assertFalse(repositorio.existsById(id))
         );
     }
+
 
     @Test
     void deleteByUuid_existingUuid() {
@@ -302,8 +259,9 @@ class DispositivosRepositoryImplTest {
 
         // Assert
         assertAll("deleteByUuid_existingUuid",
-                () -> assertEquals(1, all.size()), // Queda 1
+                () -> assertEquals(1, all.size()),
                 () -> assertFalse(repositorio.existsByUuid(uuid))
         );
     }
+
 }

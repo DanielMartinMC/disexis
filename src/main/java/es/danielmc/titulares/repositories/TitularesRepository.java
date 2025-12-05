@@ -16,9 +16,9 @@ public interface TitularesRepository extends JpaRepository<Titular, Long> {
 
     // Encontrar por nombre exacto y no borrado
     Optional<Titular> findByNombreEqualsIgnoreCaseAndIsDeletedFalse(String nombre);
-
     // Titulares por nombre
     List<Titular> findByNombreContainingIgnoreCase(String nombre);
+
 
     // Tirulares activos
     List<Titular> findByNombreContainingIgnoreCaseAndIsDeletedFalse(String nombre);
