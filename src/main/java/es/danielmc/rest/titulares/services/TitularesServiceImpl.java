@@ -1,8 +1,8 @@
 package es.danielmc.rest.titulares.services;
 
-import es.danielmc.rest.titulares.dto.TitularRequestDto;
 import es.danielmc.rest.titulares.exceptions.TitularConflictException;
 import es.danielmc.rest.titulares.exceptions.TitularNotFoundException;
+import es.danielmc.rest.titulares.dto.TitularRequestDto;
 import es.danielmc.rest.titulares.mappers.TitularMapper;
 import es.danielmc.rest.titulares.models.Titular;
 import es.danielmc.rest.titulares.repositories.TitularesRepository;
@@ -74,7 +74,7 @@ public class TitularesServiceImpl implements TitularesService {
 
     @Override
     @CachePut
-    public Titular update(Long id, TitularRequestDto titularRequestDto) {
+    public Titular update(Long id,TitularRequestDto titularRequestDto) {
         log.info("Actualizando titular: {}", titularRequestDto);
         Titular titularActual = findById(id);
         // No debe existir dos titulares con el mismo nombre
