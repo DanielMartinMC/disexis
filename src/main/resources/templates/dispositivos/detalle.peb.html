@@ -1,0 +1,18 @@
+{% extends "fragments/layout" %}
+
+{% block body %}
+
+<!-- Lista de Tarjetas -->
+{% if dispositivo is empty %}
+<div class="alert alert-info text-center">
+    <i class="bi bi-info-circle"></i> {{ message('label.dispositivo.empty') }}
+</div>
+{% else %}
+<h2> {{ message('label.dispositivo.fabricante') }} {{ dispositivo.id }}</h2>
+<ul>
+    <li> {{ message('label.dispositivo.marca') }}: {{ dispositivo.marca }}</li>
+    <li> {{ message('label.dispositivo.modelo') }}: {{ dispositivo.modelo }}</li>
+</ul>
+{% endif %}
+
+{% endblock %}

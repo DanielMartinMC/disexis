@@ -1,0 +1,30 @@
+{% extends "fragments/layout" %}
+
+{% import "fragments/inputField" %}
+
+{% block body %}
+
+<h2>{% if not modoEditar %}Nueva {% endif %} Dispositivo</h2>
+<form class="form-horizontal" id="add-dispositivo-form" method="post"
+      action="{% if modoEditar %}/dispositivos/{{dispositivoId}}/edit{% else %}/dispositivos/new{% endif %}">
+    <input name="{{ csrfParamName }}" type="hidden" value="{{ csrfToken }}">
+    <div class="form-group has-feedback">
+        {{ inputField("dispositivo", "Marca", "marca", "text", dispositivo.marca, _context) }}
+        {{ inputField("dispositivo", "Modelo", "modelo", "text", dispositivo.modelo, _context) }}
+        {{ inputField("dispositivo", "NumeroSerie", "numeroSerie", "text", dispositivo.numeroSerie, _context) }}
+        {{ inputField("dispositivo", "Fabricante", "fabricante", "text", dispositivo.fabricante, _context) }}
+        {{ inputField("dispositivo", "Tipo", "tipo", "text", dispositivo.tipo, _context) }}
+        {% if not modoEditar %}
+        {{ inputField("dispositivo", "Titular", "titular", "text", dispositivo.titular, _context) }}
+        {% endif %}
+    </div>
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button
+                    class="btn btn-primary" type="submit">{{ modoEditar ? 'Actualizar Dispositivo' : 'Añadir Dispositivo' }}
+            </button>
+        </div>
+    </div>
+</form>
+
+{% endblock %}

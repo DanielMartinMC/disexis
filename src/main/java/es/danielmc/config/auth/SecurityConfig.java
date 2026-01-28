@@ -115,7 +115,27 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
         return http.build();
     }
-
+    @Bean
+    @Order(4)
+    public SecurityFilterChain formLoginFilterChain(HttpSecurity http) throws Exception {
+        http
+                // Dejamos habilitado CSRF cuando tengamos los formularios con csrfToken
+                //.csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/public", "/public/", "/public/**").permitAll()  // ← AÑADIR SIN /**
+                        .requestMatchers("/", "/auth/**", "/webjars/**", "/css/**").permitAll()
+                        .anyRequest().authenticated())
+                .formLogin(form -> form
+                        .loginPage("/auth/login")
+                        .defaultSuccessUrl("/public", true)  // ← SIN /index
+                        .loginProcessingUrl("/auth/login-post")
+                        .permitAll())
+                .logout(logout -> logout
+                        .logoutUrl("/auth/logout")
+                        .logoutSuccessUrl("/public")  // ← SIN /index
+                        .permitAll());
+        return http.build();
+    }
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
