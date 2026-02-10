@@ -1,0 +1,31 @@
+<!-- Lista de Tarjetas -->
+{% if page is empty %}
+<div class="alert alert-info text-center">
+    <i class="bi bi-info-circle"></i> No se han encontrado dispositivos
+</div>
+{% else %}
+<table class="table table-striped">
+    <tr>
+        <th>ID</th>
+        <th>Marca</th>
+        <th>Modelo</th>
+        <th>Numero de Serie</th>
+        <th>Fabricante</th>
+        <th>Tipo</th>
+    </tr>
+    {% for dispositivo in page.content %}
+    <tr>
+        <td>{{ dispositivo.id }}</td>
+        <td>{{ dispositivo.marca }} </td>
+        <td>{{ dispositivo.modelo }}</td>
+        <td>{{ dispositivo.numeroSerie }}</td>
+        <td>{{ dispositivo.fabricante }}</td>
+        <td>{{ dispositivo.tipo }}</td>
+        <td><a href="/dispositivos/{{ dispositivo.id }}"><i class="bi bi-eye"></i></a>
+            <a href="/dispositivos/{{ dispositivo.id }}/edit"><i class="bi bi-pencil"></i></a>
+            <a href="/dispositivos/{{ dispositivo.id }}/delete"><i class="bi bi-trash"></i></a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
