@@ -21,9 +21,9 @@
         <td>{{ dispositivo.numeroSerie }}</td>
         <td>{{ dispositivo.fabricante }}</td>
         <td>{{ dispositivo.tipo }}</td>
-        <td><a href="/dispositivos/{{ dispositivo.id }}"><i class="bi bi-eye"></i></a>
-            <a href="/dispositivos/{{ dispositivo.id }}/edit"><i class="bi bi-pencil"></i></a>
-            <a href="/dispositivos/{{ dispositivo.id }}/delete"><i class="bi bi-trash"></i></a>
+        <td><a href="/admin/dispositivos/{{ dispositivo.id }}"><i class="bi bi-eye"></i></a>
+            <a href="/admin/dispositivos/{{ dispositivo.id }}/edit"><i class="bi bi-pencil"></i></a>
+            <a><i class="bi bi-trash"></i></a>
         </td>
     </tr>
     {% endfor %}

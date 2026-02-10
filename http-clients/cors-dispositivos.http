@@ -1,0 +1,7 @@
+### getAll
+GET http://localhost:3000/api/v1/dispositivos
+Origin: http://mifrontend.es
+
+### getAll
+GET http://localhost:3000/api/v1/dispositivos
+Origin: http://otrodominio.es

@@ -4,10 +4,12 @@ package es.danielmc.rest.dispositivos.services;
 import es.danielmc.rest.dispositivos.dto.DispositivoCreateDto;
 import es.danielmc.rest.dispositivos.dto.DispositivoResponseDto;
 import es.danielmc.rest.dispositivos.dto.DispositivoUpdateDto;
+import es.danielmc.rest.dispositivos.models.Dispositivo;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface DispositivosService {
@@ -28,4 +30,9 @@ public interface DispositivosService {
 
     void deleteById(Long id);
     void deleteById(Long id, Long usuarioId);
+
+    List<Dispositivo> buscarPorUsuarioId(Long usuarioId);
+
+    Optional<Dispositivo> buscarPorId(Long id);
+
 }

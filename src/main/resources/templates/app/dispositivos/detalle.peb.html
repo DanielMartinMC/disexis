@@ -9,8 +9,11 @@
 {% else %}
 <h2> {{ message('label.dispositivo.detalle') }} {{ dispositivo.id }}</h2>
 <ul>
-    <li> {{ message('label.dispositivo.numero') }}: {{ dispositivo.numero }}</li>
-    <li> {{ message('label.dispositivo.cvc') }}: {{ dispositivo.cvc }}</li>
+    <li> {{ message('label.dispositivo.marca') }}: {{ dispositivo.marca }}</li>
+    <li> {{ message('label.dispositivo.modelo') }}: {{ dispositivo.modelo }}</li>
+    <li> {{ message('label.dispositivo.numeroSerie') }}: {{ dispositivo.numeroSerie }}</li>
+    <li> {{ message('label.dispositivo.fabricante') }}: {{ dispositivo.fabricante }}</li>
+    <li> {{ message('label.dispositivo.tipo') }}: {{ dispositivo.tipo }}</li>
 </ul>
 {% endif %}
 

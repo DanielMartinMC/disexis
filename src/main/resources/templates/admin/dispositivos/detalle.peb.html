@@ -6,7 +6,7 @@
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1>
-                <i class="bi bi-credit-card-2-front"></i> {{ message('label.dispositivo.detalle') }} {{ tarjeta.id }}
+                <i class="bi bi-credit-card-2-front"></i> {{ message('label.dispositivo.detalle') }} {{ dispositivo.id }}
             </h1>
             <a href="/admin/dispositivos" class="btn btn-secondary">
                 <i class="bi bi-arrow-left"></i> Volver
@@ -21,7 +21,7 @@
     </div>
 </div>
 
-{% if tarjeta is empty %}
+{% if dispositivo is empty %}
 <div class="alert alert-info text-center">
     <i class="bi bi-info-circle"></i> {{ message('label.dispositivo.empty') }}
 </div>
@@ -29,6 +29,9 @@
 <ul>
     <li> {{ message('label.dispositivo.marca') }}: {{ dispositivo.marca }}</li>
     <li> {{ message('label.dispositivo.modelo') }}: {{ dispositivo.modelo }}</li>
+    <li> {{ message('label.dispositivo.numeroSerie') }}: {{ dispositivo.numeroSerie }}</li>
+    <li> {{ message('label.dispositivo.fabricante') }}: {{ dispositivo.fabricante }}</li>
+    <li> {{ message('label.dispositivo.tipo') }}: {{ dispositivo.tipo }}</li>
 </ul>
 {% endif %}
 

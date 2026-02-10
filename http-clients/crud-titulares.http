@@ -1,0 +1,28 @@
+### getAll
+GET http://localhost:3000/api/v1/titulares
+
+### gatById
+GET http://localhost:3000/api/v1/titulares/1
+
+### gatById (una que no existe)
+GET http://localhost:3000/api/v1/titulares/300
+
+### Nuevo dispositivo
+POST http://localhost:3000/api/v1/titulares
+Content-Type: application/json
+
+{
+  "nombre": "Alvaro"
+}
+
+### Actualiza dispositivo
+PUT http://localhost:3000/api/v1/titulares/4
+Content-Type: application/json
+
+{
+  "nombre": "Alvaro"
+}
+
+
+### Delete dispositivo
+DELETE http://localhost:3000/api/v1/titulares/4

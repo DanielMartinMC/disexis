@@ -32,6 +32,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 @Slf4j
@@ -279,5 +280,15 @@ public class DispositivosServiceImpl implements DispositivosService, Initializin
         } catch (JsonProcessingException e) {
             log.error("Error al convertir la notificación a JSON", e);
         }
+    }
+
+    @Override
+    public List<Dispositivo> buscarPorUsuarioId(Long usuarioId) {
+        return dispositivosRepository.findByUsuarioId(usuarioId);
+    }
+
+    @Override
+    public Optional<Dispositivo> buscarPorId(Long id) {
+        return dispositivosRepository.findById(id);
     }
 }

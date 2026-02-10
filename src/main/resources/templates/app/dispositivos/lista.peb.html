@@ -3,7 +3,7 @@
 {% block body %}
 
 <!-- Lista de Tarjetas -->
-{% if page is empty %}
+{% if dispositivos is empty %}
 <div class="alert alert-info text-center">
     <i class="bi bi-info-circle"></i> No se han encontrado dispositivos
 </div>
@@ -17,18 +17,14 @@
         <th>Fabricante</th>
         <th>Tipo</th>
     </tr>
-    {% for dispositivo in page.content %}
+    {% for dispositivo in dispositivos %}
     <tr>
         <td>{{ dispositivo.id }}</td>
-        <td>{{ dispositivo.marca }} </td>
+        <td><a href="/app/misdispositivos/{{ dispositivo.id }}"> {{ dispositivo.marca}}</a> </td>
         <td>{{ dispositivo.modelo }}</td>
         <td>{{ dispositivo.numeroSerie }}</td>
         <td>{{ dispositivo.fabricante }}</td>
         <td>{{ dispositivo.tipo }}</td>
-        <td><a href="/dispositivos/{{ dispositivo.id }}"><i class="bi bi-eye"></i></a>
-            <a href="/dispositivos/{{ dispositivo.id }}/edit"><i class="bi bi-pencil"></i></a>
-            <a href="/dispositivos/{{ dispositivo.id }}/delete"><i class="bi bi-trash"></i></a>
-        </td>
     </tr>
     {% endfor %}
 </table>

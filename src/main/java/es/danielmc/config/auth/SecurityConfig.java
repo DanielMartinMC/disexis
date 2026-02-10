@@ -38,6 +38,7 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 public class SecurityConfig {
     private final UserDetailsService userDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final LoginSuccessHandler loginSuccessHandler;
 
     @Value("${api.version}")
     private String apiVersion;
@@ -95,11 +96,11 @@ public class SecurityConfig {
     @Bean
     @Order(2)
     public SecurityFilterChain openapiFilterChain(HttpSecurity http) throws Exception {
+        String[] swaggerPaths = { "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html"};
         http
-                .securityMatcher("/swagger-ui/**")
-                .securityMatcher("/v3/api-docs/**")
+                .securityMatcher(swaggerPaths)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll());
+                        .requestMatchers(swaggerPaths).permitAll());
         return http.build();
     }
 
@@ -115,6 +116,8 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
         return http.build();
     }
+
+    // Este filtro permite el acceso a la consola de H2. Quitar en producción
     @Bean
     @Order(4)
     public SecurityFilterChain formLoginFilterChain(HttpSecurity http) throws Exception {
@@ -123,11 +126,12 @@ public class SecurityConfig {
                 //.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/public", "/public/", "/public/**").permitAll()  // ← AÑADIR SIN /**
-                        .requestMatchers("/", "/auth/**", "/webjars/**", "/css/**").permitAll()
+                        .requestMatchers("/", "/auth/**", "/webjars/**", "/css/**", "/images/**").permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .formLogin(form -> form
                         .loginPage("/auth/login")
-                        .defaultSuccessUrl("/public", true)  // ← SIN /index
+                        .successHandler(loginSuccessHandler)  // para gestionar la cookie de visitas
                         .loginProcessingUrl("/auth/login-post")
                         .permitAll())
                 .logout(logout -> logout
@@ -136,6 +140,7 @@ public class SecurityConfig {
                         .permitAll());
         return http.build();
     }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
